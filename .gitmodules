@@ -1,0 +1,3 @@
+[submodule "Rpackage"]
+	path = Rpackage
+	url = git@github.com:jakub-tomczak/BWM.git
