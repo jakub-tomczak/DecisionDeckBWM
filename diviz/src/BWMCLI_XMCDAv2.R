@@ -60,7 +60,6 @@ xmcdaData <- .jnew("org/xmcda/XMCDA")
 loadXMCDAv2(xmcdaDatav2, inDirectory, criteriaFile, mandatory = TRUE, xmcdaMessages,"criteria")
 loadXMCDAv2(xmcdaDatav2, inDirectory, bestPreferencesOfCriteriaFile, mandatory = FALSE, xmcdaMessages,"criteriaValues")
 loadXMCDAv2(xmcdaDatav2, inDirectory, worstPreferencesOfCriteriaFile, mandatory = FALSE, xmcdaMessages,"criteriaValues")
-loadXMCDAv2(xmcdaDatav2, inDirectory, criteriaWeightsFile, mandatory = FALSE, xmcdaMessages,"criteriaSets")
 
 # if we have problem with the inputs, it is time to stop
 
@@ -89,33 +88,6 @@ if (xmcdaMessages$programExecutionResultsList$size() > 0){
     stop(paste("An error has occured while converting the inputs to XMCDA v3. For further details, see ", messagesFile, sep=""))
   }
 }
-
-#input handler
-library(purrr)
-
-checkAndExtractInputs <- function(xmcdaData, programExecutionResult) { # TODO
-  criteria <- getActiveCriteria(xmcdaData)
-  
-  criteriaNames <- sapply(as.list(criteria$criteria), function(x){x$name()})
-  criteriaValuesList <- getNumericCriteriaValuesList(xmcdaData)
-  
-  if(is_empty(criteriaValuesList)){
-    putProgramExecutionResult(xmcdaMessages, errors = "No `criteriaValues` node has been found.")
-  }
-  
-  if(is.null(criteriaValuesList$bestToOthers)){
-    putProgramExecutionResult(xmcdaMessages, errors = "`criteriaValues` node with id=`best-to-others` not found.")
-  }
-  if(is.null(criteriaValuesList$othersToWorst)){
-    putProgramExecutionResult(xmcdaMessages, errors = "`criteriaValues` node with id=`others-to-worst` not found.")
-  }
-  bestToOthers <- criteriaValuesList$bestToOthers
-  othersToWorst <- criteriaValuesList$othersToWorst
-  return(list(criteria = list(ids = criteria$criteriaIDs, names = criteriaNames), bestToOthers = bestToOthers, othersToWorst = othersToWorst))
-}
-
-#eof input handler
-
 
 # let's check the inputs and convert them into our own structures
 

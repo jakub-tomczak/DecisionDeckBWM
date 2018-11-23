@@ -255,8 +255,8 @@ solveProblem <- function(model){
     consistencyRatio <- model$ksiValue / consistencyIndex[as.integer(model$a_bw)]
   }
 
-  ranking <- getRanking(model, weights)
-  result <- list(weights = weights, ranking = ranking['ix'], alternativesValues = ranking['x'], consistencyRatio = consistencyRatio)
+  #ranking <- getRanking(model, weights)
+  result <- list(criteriaNames, criteriaWeights = weights, consistencyRatio = consistencyRatio)
 }
 
 getRanking <- function(model, weights){

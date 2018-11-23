@@ -5,11 +5,13 @@
 
 XMCDA_v2_TAG_FOR_FILENAME <- list(
   # output name -> XMCDA v2 tag
+  criteriaWeights = "criteriaValues",
   messages = "methodMessages"
 )
 
 XMCDA_v3_TAG_FOR_FILENAME <- list(
   # output name -> XMCDA v3 tag
+  criteriaWeights = "criteriaValues",
   messages = "programExecutionResult"
 )
 
