@@ -1,5 +1,6 @@
 BWM <- function(inputs)
 {
-  # calculation goes here
-  return(...)
+  library(Rglpk)
+  output <- calculateWeights(inputs$criteria$names, inputs$bestToOthers, inputs$othersToWorst)
+  return(output$result)
 }

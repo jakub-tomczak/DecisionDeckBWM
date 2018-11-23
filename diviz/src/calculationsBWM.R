@@ -26,7 +26,7 @@ isConsistent <- function(model){
   bestOverWorstPreferenceValue <- model$bestToOthers[worstCriterionIndex]
 
   # a_bj x a_jw = a_bw for all j
-  list(isConsistent = all(bestToOthers*worstToOthers == bestOverWorstPreferenceValue), a_bw = bestOverWorstPreferenceValue)
+  list(isConsistent = all(model$bestToOthers*model$worstToOthers == bestOverWorstPreferenceValue), a_bw = bestOverWorstPreferenceValue)
 }
 # tries to combine constraint, if constraint already belongs to the constraints set then
 # it resturns constraints and a flag that indicates that constraints' state hasn't been changed
@@ -148,7 +148,6 @@ createModelsObjective <- function(model, objectiveIndex, objectiveValue = 1){
   objective
 }
 
-#' @export
 buildModel <- function(bestToOthers, worstToOthers, criteriaNames, createMultipleOptimalSolutions = FALSE, rankBasedOnCenterOfInterval = FALSE){
   model <- validateData(bestToOthers, worstToOthers, criteriaNames)
   consistency <- isConsistent(model)
@@ -226,8 +225,8 @@ buildModel <- function(bestToOthers, worstToOthers, criteriaNames, createMultipl
 
 #' @import Rglpk
 #' @export
-solveProblem <- function(model){
-  assert(!is.null(model), 'Model cannot be null')
+calculateWeights <- function(criteriaNames, bestToOthers, worstToOthers){
+  model <- buildModel(bestToOthers, worstToOthers, criteriaNames)
   consistencyIndex <- c(0, .44, 1.0, 1.63, 2.3, 3., 3.73, 4.47, 5.23)
   if(model$isConsistent || (!model$isConsistent && !model$createMultipleOptimalSolutions)){
     #unique optimal solution
@@ -256,7 +255,8 @@ solveProblem <- function(model){
   }
 
   #ranking <- getRanking(model, weights)
-  result <- list(criteriaNames, criteriaWeights = weights, consistencyRatio = consistencyRatio)
+  result <- list(criteriaNames = criteriaNames, criteriaWeights = weights, consistencyRatio = consistencyRatio)
+  list(result = result, model = model)
 }
 
 getRanking <- function(model, weights){
