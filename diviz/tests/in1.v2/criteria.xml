@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmcda:XMCDA xmlns:xmcda="http://www.decision-deck.org/2017/XMCDA-2.2.2" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-Instance">
+<criteria>
+	<criterion id="g1" name="quality" />
+	<criterion id="g2" name="price"/>
+	<criterion id="g3" name="comfort"/>
+	<criterion id="g4" name="safety"/>
+	<criterion id="g5" name="style"/>
+</criteria>
+</xmcda:XMCDA>
