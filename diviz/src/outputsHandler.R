@@ -23,13 +23,17 @@ xmcda_v2_tag <- function(outputName){
   return (XMCDA_v2_TAG_FOR_FILENAME[[outputName]])
 }
 
+convertCriteriaWeights <- function(results, programExecutionResult){
+  xmcda <- .jnew("org/xmcda/XMCDA")
+  criteriaValues <-.jnew("org/xmcda/CriteriaValues")
+  for (i in 1:length(results$criteriaIDs)){
+    criterion <- .jnew("org/xmcda/Criterion",results$criteriaIDs[i], results$criteriaNames[i])
+    criteriaValues$put(criterion, .jnew("java/lang/Double", results$criteriaWeights[i]))
+  }
+  xmcda$criteriaValuesList$add(criteriaValues)
+  xmcda
+}
 
-convert <- function(results, programExecutionResult) { # TODO
-
-  # converts the outputs of the computation to XMCDA objects
-
-  # translate the results into XMCDA v3
-
-  # if an error occurs, return null, else a dictionnary "xmcdaTag -> xmcdaObject"
-
+convert <- function(results, programExecutionResult) {
+ list(criteriaValues = convertCriteriaWeights(results, programExecutionResult)) 
 }
