@@ -89,7 +89,7 @@ createBaseModelConstraints <- function(model, constraints, vectorType, dir, rhs 
       }
     }
   }
-  list(constraints = constraints, addedNumber = numberOfAddedConstraints)
+  list(constraints = constraints, numberOfAddedConstraints = numberOfAddedConstraints)
 }
 
 #constraints for weights' sum and their minimal value (w >= 0)
@@ -115,11 +115,12 @@ buildBasicConstraints <- function(model){
 }
 
 addConstraintsFromResult <- function(constraints, result){
-  if(result$addedNumber > 0){
+  if(result$numberOfAddedConstraints > 0){
     constraints <- result$constraints
-    #add constraints that arise from removing abs
-    #get all constraints that have just been added and multiply them by -1
-    constraintsToScale <- tail(constraints, n=result$addedNumber)
+    # add constraints that stem from removing abs
+    # take only result$numberOfAddedConstraints constraints that has just been added (there may have been some duplicates)
+    # and multiply them by -1
+    constraintsToScale <- tail(constraints, n=result$numberOfAddedConstraints)
     lapply(constraintsToScale, function(x){
       constraints <<- combineConstraints(constraints, absConstraint(x))$constraints # '<<-' refers to outer scope
     })
@@ -171,7 +172,7 @@ buildModel <- function(bestToOthers, worstToOthers, criteriaNames, createMultipl
   if(model$isConsistent){
     #add best-to-others constraints
     result <- createBaseModelConstraints(model, constraints, vectorType = "best", dir = "==")
-    if(result$addedNumber > 0){
+    if(result$numberOfAddedConstraints > 0){
       constraints <- result$constraints
     }
   }  else {
@@ -182,39 +183,11 @@ buildModel <- function(bestToOthers, worstToOthers, criteriaNames, createMultipl
       #add others-to-worst constraints
       result <- createBaseModelConstraints(model, constraints, vectorType = "worst", dir = "<=", ksiIndexValue = -1)
       constraints <- addConstraintsFromResult(constraints, result)
-
-
-    if(model$createMultipleOptimalSolutions){
-      # here we should calculate only ksi value that will be used to
-      # create model, which is used to determine lower and upper bounds
-      # of the interval weights
-      # however, current implementation is wrong
-      stop("Calculating weights as intervals is not implemented yet.")
-
-      model$constraints = constraintsListToMatrix(constraints)
-      model$objective <- createModelsObjective(model, model$ksiIndex)
-      #minimize objective's value
-      model$maximize <- FALSE
-
-      model$ksiValue <- solveLP(model)$optimum
-      # find minimal values
-
-      #constraints sum of weights to 1, all weights non-negative
-      constraints <- buildBasicConstraints(model)
-
-      #add best-to-others constraints
-      result <- createBaseModelConstraints(model, constraints, vectorType = "best", dir = "<=", rhs = model$ksiValue)
-      constraints <- addConstraintsFromResult(constraints, result)
-
-      #add others-to-worst constraints
-      result <- createBaseModelConstraints(model, constraints, vectorType = "worst", dir = "<=", rhs = model$ksiValue)
-      constraints <- addConstraintsFromResult(constraints, result)
-    }
   }
 
   model$constraints = constraintsListToMatrix(constraints)
   model$objective <- createModelsObjective(model, model$ksiIndex)
-  #minimize objective's value
+  #minimize objective's value by default
   model$maximize <- FALSE
 
   model
@@ -227,60 +200,16 @@ buildModel <- function(bestToOthers, worstToOthers, criteriaNames, createMultipl
 #' @export
 calculateWeights <- function(criteriaNames, bestToOthers, worstToOthers){
   model <- buildModel(bestToOthers, worstToOthers, criteriaNames)
+  #const values that are listed in https://doi.org/10.1016/j.omega.2015.12.001
   consistencyIndex <- c(0, .44, 1.0, 1.63, 2.3, 3., 3.73, 4.47, 5.23)
-  if(model$isConsistent || (!model$isConsistent && !model$createMultipleOptimalSolutions)){
-    #unique optimal solution
-    result <- solveLP(model)
-    weights <- result$solution[1:model$ksiIndex-1]
-    consistencyRatio <- result$solution[model$ksiIndex] / consistencyIndex[as.integer(model$a_bw)]
-  } else {
-    #multi-optimality, get intervals
-    nrCriteria <- length(model$bestToOthers)
-    # returns list of length equal to the number of the weights
-    # that contains lists of two elements - lower an upper bound
-    weights <- lapply(seq(nrCriteria), function(x){
-      model$objective <- createModelsObjective(model, x)
 
-      #find lower bound
-      model$maximize <- FALSE
-      lowerBound <- solveLP(model)$solution[x]
+  #unique optimal solution
+  result <- solveLP(model)
+  weights <- result$solution[1:model$ksiIndex-1]
+  consistencyRatio <- result$solution[model$ksiIndex] / consistencyIndex[as.integer(model$a_bw)]
 
-      #find upper bound
-      model$maximize <- TRUE
-      upperBound <- solveLP(model)$solution[x]
-
-      list(lowerBound, upperBound)
-    })
-    consistencyRatio <- model$ksiValue / consistencyIndex[as.integer(model$a_bw)]
-  }
-
-  #ranking <- getRanking(model, weights)
   result <- list(criteriaNames = criteriaNames, criteriaWeights = weights, consistencyRatio = consistencyRatio)
   list(result = result, model = model)
-}
-
-getRanking <- function(model, weights){
-  if(model$isConsistent || (!model$isConsistent && !model$createMultipleOptimalSolutions)){
-    sorted <- sort(weights, decreasing = TRUE, index.return=TRUE)
-  } else {
-    if(model$rankBasedOnCenterOfInterval){
-      # TODO: rank the criteria or alternatives based on the center of intervals
-      stop("Ranking based on the center of intervals is not implemented")
-    } else {
-      #rank the criteria or alternatives based on the interval weights
-      DJ_ij <- sapply(weights, function(a){
-        sapply(weights, function(b){
-          # a and b in numerator are exchanged, otherwise R creates transposed matrix
-          ( max(0, b[[2]] - a[[1]]) - max(0, b[[1]] - a[[2]]) ) / ( (a[[2]] - a[[1]]) + (b[[2]]-b[[1]]) )
-        })
-      })
-      P_ij <- ifelse(DJ_ij > .5, 1, 0)
-      rank <- apply(P, MARGIN = 1, function(x){sum(x)})
-      sorted <- sort(rank, index.return=TRUE)
-    }
-  }
-  sorted$ix <- model$criteriaNames[sorted$ix]
-  sorted
 }
 
 solveLP <- function(model){
