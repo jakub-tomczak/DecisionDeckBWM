@@ -18,7 +18,7 @@
 			<xmcda tag="criteria"/>
 		</input>
 
-		<input id="bestToOthersPreferences" name="bestPreferencesOfCriteria" displayName="Preferences" isoptional="1">
+		<input id="bestToOthersPreferences" name="bestPreferencesOfCriteria" displayName="Preferences">
 			<documentation>
 				<description>
                     Preferences of the best criterion over all the other criteria. Preferences are defined as natural number between 1 and 9.
@@ -28,7 +28,7 @@
 			<xmcda tag="criteriaValues"/>
 		</input>
 
-		<input id="othersToWorstPreferences" name="worstPreferencesOfCriteria" displayName="Preferences" isoptional="1">
+		<input id="othersToWorstPreferences" name="worstPreferencesOfCriteria" displayName="Preferences">
 			<documentation>
 				<description>
                     Preferences of all the criteria over the worst criterion. Preferences are defined as natural number between 1 and 9.

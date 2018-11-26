@@ -59,8 +59,8 @@ xmcdaDatav2 <- .jnew("org/xmcda/v2/XMCDA")
 xmcdaData <- .jnew("org/xmcda/XMCDA")
 
 loadXMCDAv2(xmcdaDatav2, inDirectory, criteriaFile, mandatory = TRUE, xmcdaMessages,"criteria")
-loadXMCDAv2(xmcdaDatav2, inDirectory, bestPreferencesOfCriteriaFile, mandatory = FALSE, xmcdaMessages,"criteriaValues")
-loadXMCDAv2(xmcdaDatav2, inDirectory, worstPreferencesOfCriteriaFile, mandatory = FALSE, xmcdaMessages,"criteriaValues")
+loadXMCDAv2(xmcdaDatav2, inDirectory, bestPreferencesOfCriteriaFile, mandatory = TRUE, xmcdaMessages,"criteriaValues")
+loadXMCDAv2(xmcdaDatav2, inDirectory, worstPreferencesOfCriteriaFile, mandatory = TRUE, xmcdaMessages,"criteriaValues")
 
 # if we have problem with the inputs, it is time to stop
 
