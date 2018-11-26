@@ -3,37 +3,47 @@
     <criteriaValues id="othersToWorst" name="Others-to-worst vector">
         <criterionValue>
             <criterionID>g1</criterionID>
-            <value>
-                <integer>4</integer>
-            </value>
+            <values>
+                <value>
+                    <integer>4</integer>
+                </value>
+            </values>
         </criterionValue>
         
         <criterionValue>
             <criterionID>g2</criterionID>
-            <value>
-                <integer>8</integer>
-            </value>
+            <values>
+                <value>
+                    <integer>8</integer>
+                </value>
+            </values>
         </criterionValue>
 
         <criterionValue>
             <criterionID>g3</criterionID>
-            <value>
-                <integer>2</integer>
-            </value>
+            <values>
+                <value>
+                    <integer>2</integer>
+                </value>
+            </values>
         </criterionValue>
 
         <criterionValue>
             <criterionID>g4</criterionID>
-            <value>
-                <integer>3</integer>
-            </value>
+            <values>
+                <value>
+                    <integer>3</integer>
+                </value>
+            </values>
         </criterionValue>
 
         <criterionValue>
             <criterionID>g5</criterionID>
-            <value>
-                <integer>1</integer>
-            </value>
+            <values>
+                <value>
+                    <integer>1</integer>
+                </value>
+            </values>
         </criterionValue>
     </criteriaValues>
 </xmcda:XMCDA>
